@@ -16,7 +16,7 @@ from math import sqrt
 
 # Read input arguments from yalm file
 try:
-    with open(f'{os.getcwd()}\\dataset_configuration.yalm', 'r') as f:
+    with open(f'{os.getcwd()}/dataset_configuration.yalm', 'r') as f:
         leak_pipes = yaml.load(f.read())
 except:
     print('"dataset_configuration" file not found.')
@@ -60,8 +60,8 @@ class LeakDatasetCreator:
         self.wn = wntr.network.WaterNetworkModel(inp_file)
 
         for name, node in self.wn.junctions():
-            node.nominal_pressure = 25
-            #print(node.nominal_pressure)
+            node.required_pressure = 25
+            #print(node.required_pressure)
             #print(node.minimum_pressure)
 
         self.inp = os.path.basename(self.wn.name)[0:-4]
@@ -153,7 +153,7 @@ class LeakDatasetCreator:
                 pattern_name = f'{str(leak_node[leak_i])}'
                 self.wn.add_pattern(pattern_name, pattern_array)
                 leak_node[leak_i].demand_timeseries_list[0].pattern_name = pattern_name
-                leak_node[leak_i].nominal_pressure = nominal_pres
+                leak_node[leak_i].required_pressure = nominal_pres
                 leak_node[leak_i].minimum_pressure = 0
 
                 # save times of leak
@@ -193,7 +193,8 @@ class LeakDatasetCreator:
             pickle.dump(self.wn, f)
 
         # Run wntr simulator
-        sim = wntr.sim.WNTRSimulator(self.wn, mode=Mode_Simulation)
+        self.wn.options.hydraulic.demand_model = Mode_Simulation
+        sim = wntr.sim.WNTRSimulator(self.wn)
         results = sim.run_sim()
         if results.node["pressure"].empty:
             print("Negative pressures.")
