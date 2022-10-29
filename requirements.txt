@@ -2,3 +2,5 @@ numpy==1.23.4
 pandas==1.5.1
 PyYAML==5.4.1
 wntr==0.4.2
+xlsxwriter==3.0.3
+pipreqs==0.4.11
