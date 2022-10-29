@@ -16,7 +16,7 @@ from math import sqrt
 
 # Read input arguments from yalm file
 try:
-    with open(f'{os.getcwd()}/dataset_configuration.yalm', 'r') as f:
+    with open(os.path.join(os.getcwd(), "dataset_configuration_evaluation.yalm"), 'r') as f:
         leak_pipes = yaml.load(f.read())
 except:
     print('"dataset_configuration" file not found.')
@@ -29,7 +29,7 @@ leakages = leakages[1:]
 number_of_leaks = len(leakages)
 inp_file = leak_pipes['Network']['filename']
 print(f'Run input file: "{inp_file}"')
-results_folder = f'{os.getcwd()}\\Results\\'
+results_folder = os.path.join(os.getcwd(), "Results")
 pressure_sensors = leak_pipes['pressure_sensors']
 
 def get_sensors(leak_pipes, field):
@@ -226,7 +226,9 @@ class LeakDatasetCreator:
                 #self.create_csv_file(leaks, self.time_stamp, 'Description', f'{leakages_folder}\\Leak_{str(leak_node[leak_i])}_demand.csv')
                 df1 = pd.DataFrame(totals_info)
                 df2 = pd.DataFrame(total_Leaks)
-                writer = pd.ExcelWriter(f'{leakages_folder}\\Leak_{NODEID}.xlsx', engine='xlsxwriter')
+                df1.to_csv(os.path.join(leakages_folder, f"Leak_{NODEID}_Demand.csv"))
+                df2.to_csv(os.path.join(leakages_folder, f"Leak_{NODEID}_Info.csv"))
+                writer = pd.ExcelWriter(os.path.join(leakages_folder, f'Leak_{NODEID}.xlsx'), engine='xlsxwriter')
                 df1.to_excel(writer, sheet_name='Info', index=False)
                 df2.to_excel(writer, sheet_name='Demand (m3_h)', index=False)
                 writer.save()
@@ -275,7 +277,7 @@ class LeakDatasetCreator:
             df3 = pd.DataFrame(total_flows)
             df4 = pd.DataFrame(total_levels)
             # Create a Pandas Excel writer using XlsxWriter as the engine.
-            writer = pd.ExcelWriter(f'{results_folder}Measurements.xlsx', engine='xlsxwriter')
+            writer = pd.ExcelWriter(os.path.join(results_folder, "Measurements.xlsx"), engine='xlsxwriter')
 
             # Convert the dataframe to an XlsxWriter Excel object.
             # Pressures (m), Demands (m^3/h), Flows (m^3/h), Levels (m)
@@ -283,6 +285,11 @@ class LeakDatasetCreator:
             df2.to_excel(writer, sheet_name='Demands (L_h)', index=False)
             df3.to_excel(writer, sheet_name='Flows (m3_h)', index=False)
             df4.to_excel(writer, sheet_name='Levels (m)', index=False)
+
+            df1.to_csv(os.path.join(results_folder, "Pressures.csv"))
+            df2.to_csv(os.path.join(results_folder, "Demands.csv"))
+            df3.to_csv(os.path.join(results_folder, "Flows.csv"))
+            df4.to_csv(os.path.join(results_folder, "Levels.csv"))
 
             # Close the Pandas Excel writer and output the Excel file.
             writer.save()
